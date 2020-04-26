@@ -24,8 +24,13 @@ spring:
     username: mmoney
     password: mmoney
     url: jdbc:oracle:thin:@localhost:20303:PRTP
-    #hikari: 
-     # connection-test-query:  SELECT 1
+    hikari:
+      connection-timeout: 100000
+      data-source-properties:
+        oracle:
+          net:
+            CONNECT_TIMEOUT: 100000
+            READ_TIMEOUT: 100000
   jpa:
     database-platform: org.hibernate.dialect.Oracle10gDialect
     show-sql: true

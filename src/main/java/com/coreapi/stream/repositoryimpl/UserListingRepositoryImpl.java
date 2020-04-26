@@ -2,12 +2,14 @@ package com.coreapi.stream.repositoryimpl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.query.NativeQuery;
 import org.springframework.stereotype.Repository;
 
 import com.coreapi.stream.model.UserListingVO;
@@ -34,6 +36,21 @@ public class UserListingRepositoryImpl implements UserListingRepository {
 			ex.printStackTrace();
 		}
 		return Collections.emptyList();
+	}
+
+	@Override
+	public Stream<String> getStreamOfUsersIncludingChannel(UserListingRequest userListingRequest) {
+		String query = getUsersMsisdnQueryIncludingChannel(userListingRequest);
+		try {
+			if (!query.isEmpty()) {
+				NativeQuery sqlQuery = mEntityManager.unwrap(Session.class).createSQLQuery(query);
+				sqlQuery.setTimeout(10000);
+				return sqlQuery.stream();
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
 	}
 
 	private String getUsersQueryIncludingChannel(UserListingRequest userListingRequest) {
@@ -66,5 +83,17 @@ public class UserListingRepositoryImpl implements UserListingRepository {
 				+ "    mtx_domains md, " + "    mtx_categories mc " + "  WHERE u.category_code=mc.category_code "
 				+ "  AND mc.domain_code   =md.domain_code " + "  AND u.status        <>'N' "
 				+ "  AND u.category_code IN ( 'NWADM','SUADM' ) " + "  )";
+	}
+
+	private String getUsersMsisdnQueryIncludingChannel(UserListingRequest userListingRequest) {
+		return "SELECT msisdn" + " FROM " + "  (SELECT " + "u.msisdn AS msisdn " + "  FROM users u, "
+				+ "    mtx_domains md, " + "    mtx_categories mc " + "  WHERE u.category_code=mc.category_code "
+				+ "  AND mc.domain_code   =md.domain_code " + "  AND u.status        <>'N' "
+				+ "  AND u.user_Type      = 'CHANNEL' " + "  AND u.category_code  = '"
+				+ userListingRequest.getChannelCategoryCode() + "'" + "  AND mc.domain_code   = '"
+				+ userListingRequest.getChannelDomainCode() + "'" + "  UNION ALL " + "  SELECT " + "u.msisdn AS msisdn "
+				+ "  FROM users u, " + " mtx_domains md, " + "mtx_categories mc "
+				+ "  WHERE u.category_code=mc.category_code " + "  AND mc.domain_code   =md.domain_code "
+				+ "  AND u.status        <>'N' " + "  AND u.category_code IN ( 'NWADM','SUADM' ) " + "  )";
 	}
 }

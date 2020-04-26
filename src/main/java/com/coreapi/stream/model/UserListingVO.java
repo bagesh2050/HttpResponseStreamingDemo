@@ -22,6 +22,8 @@ public class UserListingVO {
 	public void setMsisdn(String msisdn) {
 		if (msisdn != null)
 			this.msisdn = msisdn;
+
+		System.out.println("Msisdn=" + msisdn);
 	}
 
 	public void setLoginId(String loginId) {

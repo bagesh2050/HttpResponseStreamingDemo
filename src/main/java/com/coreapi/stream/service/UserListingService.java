@@ -1,7 +1,9 @@
 package com.coreapi.stream.service;
 
 import java.io.ObjectOutputStream;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,27 @@ public class UserListingService {
 				for (UserListingVO user : userDataResult) {
 					oos.write(user.toString().getBytes());
 				}
+			}
+		};
+
+		return new ResponseEntity<>(stream, HttpStatus.OK);
+	}
+
+	public ResponseEntity<StreamingResponseBody> getUsersAsStream(UserListingRequest userListingRequest) {
+
+		StreamingResponseBody stream = outputStream -> {
+
+			Stream<String> userDataResult = userListingRepository.getStreamOfUsersIncludingChannel(userListingRequest);
+
+			try (ObjectOutputStream oos = new ObjectOutputStream(outputStream)) {
+
+				Iterator<String> itr = userDataResult.iterator();
+
+				while (itr.hasNext()) {
+					oos.write(itr.next().getBytes());
+				}
+
+				userDataResult.close();
 			}
 		};
 

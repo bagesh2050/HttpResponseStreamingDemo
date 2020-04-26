@@ -1,7 +1,6 @@
 package com.coreapi.stream.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,9 +16,13 @@ public class UserListingController {
 	@Autowired
 	private UserListingService userListingService;
 
-	@GetMapping(value = "/userlisting", produces = { MediaType.APPLICATION_XML_VALUE,
-			MediaType.APPLICATION_JSON_VALUE })
+	@GetMapping(value = "/userlisting")
 	public ResponseEntity<StreamingResponseBody> fetchUsersList(UserListingRequest requestParams) {
 		return userListingService.getUsersList(requestParams);
+	}
+
+	@GetMapping(value = "/userlistingstream")
+	public ResponseEntity<StreamingResponseBody> fetchUsersStream(UserListingRequest requestParams) {
+		return userListingService.getUsersAsStream(requestParams);
 	}
 }

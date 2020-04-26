@@ -1,7 +1,3 @@
-#gitlab-ci
-.gitlab-ci.yml
-pom.xml
-
 ### STS ###
 .apt_generated
 .classpath
