@@ -18,8 +18,7 @@ public class UsersController {
 	@Autowired
 	private UserService service;
 
-	// @Transactional(readOnly = true)
-	@GetMapping(value = "/userstream")
+	@GetMapping(value = "/userstream", produces = "application/stream+json")
 	public ResponseEntity<StreamingResponseBody> fetchUsersStream() {
 
 		StreamingResponseBody stream = this::writeTo;
